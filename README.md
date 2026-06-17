@@ -1,4 +1,4 @@
-# VitaCore Frontend — v1.0.0
+# ecommerce Frontend — v1.0.0
 
 Production-grade React storefront + Admin Dashboard for the VitaCore Health Supplements platform.
 
@@ -26,7 +26,7 @@ Production-grade React storefront + Admin Dashboard for the VitaCore Health Supp
 ```bash
 # 1. Clone and install
 git clone <repo-url>
-cd vitacore-frontend
+cd ecommerce-frontend
 npm install
 
 # 2. Configure environment
@@ -81,7 +81,7 @@ src/
 
 ## API Coverage
 
-All VitaCore backend v2.0 endpoints are wired:
+All ecommerce backend v2.0 endpoints are wired:
 
 | Module    | Coverage                                                  |
 |-----------|-----------------------------------------------------------|
@@ -138,10 +138,10 @@ All VitaCore backend v2.0 endpoints are wired:
 # Build production image
 docker build \
   --build-arg VITE_API_BASE_URL=https://api.vitacore.ng \
-  -t vitacore-frontend:latest .
+  -t ecommerce-frontend:latest .
 
 # Run
-docker run -p 80:80 vitacore-frontend:latest
+docker run -p 80:80 ecommerce-frontend:latest
 
 # Or with docker-compose (full stack)
 docker compose up -d
@@ -169,7 +169,7 @@ Requires GitHub Secrets:
 | Variable              | Required | Default                    |
 |-----------------------|----------|----------------------------|
 | `VITE_API_BASE_URL`   | Yes      | `http://localhost:3000`    |
-| `VITE_APP_NAME`       | No       | `VitaCore Health`          |
+| `VITE_APP_NAME`       | No       | `winners Health`          |
 | `VITE_APP_VERSION`    | No       | `1.0.0`                    |
 
 ---

@@ -43,7 +43,7 @@ export default function StorefrontLayout() {
           <Link to='/' style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 24 }}>🌿</span>
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, color: 'var(--forest-deep)', letterSpacing: '-0.02em' }}>
-              VitaCore
+              Winners Health
             </span>
           </Link>
 
