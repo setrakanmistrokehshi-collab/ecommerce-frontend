@@ -10,37 +10,76 @@ const useAuthStore = create(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
+      isHydrated: false,
       isLoading: false,
       error: null,
 
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) =>
+        set({
+          user,
+          isAuthenticated: !!user,
+        }),
 
       login: async (credentials) => {
         set({ isLoading: true, error: null });
+
         try {
           const { data } = await authApi.login(credentials);
+
           TokenStore.set(data.accessToken);
           TokenStore.setRefresh(data.refreshToken);
-          set({ user: data.user, isAuthenticated: true, isLoading: false });
+
+          set({
+            user: data.user,
+            isAuthenticated: true,
+            isHydrated: true,
+            isLoading: false,
+            error: null,
+          });
+
           return { success: true };
         } catch (err) {
           const msg =
-            err?.response?.data?.message || 'Login failed. Check your credentials.';
-          set({ error: msg, isLoading: false });
+            err?.response?.data?.message ||
+            'Login failed. Check your credentials.';
+
+          set({
+            error: msg,
+            isLoading: false,
+          });
+
           return { success: false, error: msg };
         }
       },
 
       register: async (data) => {
         set({ isLoading: true, error: null });
+
         try {
           const res = await authApi.register(data);
-          set({ isLoading: false });
-          return { success: true, data: res.data };
+
+          set({
+            isLoading: false,
+          });
+
+          return {
+            success: true,
+            data: res.data,
+          };
         } catch (err) {
-          const msg = err?.response?.data?.message || 'Registration failed.';
-          set({ error: msg, isLoading: false });
-          return { success: false, error: msg };
+          const msg =
+            err?.response?.data?.message ||
+            'Registration failed.';
+
+          set({
+            error: msg,
+            isLoading: false,
+          });
+
+          return {
+            success: false,
+            error: msg,
+          };
         }
       },
 
@@ -48,20 +87,58 @@ const useAuthStore = create(
         try {
           await authApi.logout();
         } catch (_) {
-          // Ignore — clear local state regardless
+          // ignore
         }
+
         TokenStore.clear();
-        set({ user: null, isAuthenticated: false, error: null });
+
+        set({
+          user: null,
+          isAuthenticated: false,
+          isHydrated: true,
+          isLoading: false,
+          error: null,
+        });
       },
 
+      // Validate token and refresh user data
       fetchMe: async () => {
-        if (!TokenStore.get()) return;
+        set({
+          isLoading: true,
+        });
+
         try {
+          const token = TokenStore.get();
+
+          if (!token) {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isHydrated: true,
+              isLoading: false,
+            });
+            return;
+          }
+
           const { data } = await authApi.me();
-          set({ user: data.user, isAuthenticated: true });
+
+          set({
+            user: data.user,
+            isAuthenticated: true,
+            isHydrated: true,
+            isLoading: false,
+            error: null,
+          });
         } catch (_) {
           TokenStore.clear();
-          set({ user: null, isAuthenticated: false });
+
+          set({
+            user: null,
+            isAuthenticated: false,
+            isHydrated: true,
+            isLoading: false,
+            error: null,
+          });
         }
       },
 
@@ -69,7 +146,11 @@ const useAuthStore = create(
     }),
     {
       name: 'winners-auth',
-      partialize: (s) => ({ user: s.user, isAuthenticated: s.isAuthenticated }),
+
+      // Persist only user information
+      partialize: (state) => ({
+        user: state.user,
+      }),
     }
   )
 );

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import useAuthStore from '@/context/authStore';
@@ -27,6 +27,8 @@ import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminAnalytics from '@/pages/admin/AdminAnalytics';
+import AddProduct from '@/pages/admin/AddProduct';
+//import EditProduct from '@/pages/admin/EditProduct';
 import Customers from '@/pages/admin/Customers';
 import Orders from '@/pages/admin/Orders';
 import Reports from '@/pages/admin/Reports';
@@ -37,29 +39,57 @@ import Settings from '@/pages/admin/Settings';
 // ROUTE GUARDS
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * BUG 1 FIX — Hydration guard.
+ *
+ * createBrowserRouter is defined at module level, so guards run before
+ * fetchMe() resolves. Without this, RequireAdmin sees user=null and
+ * redirects to / before the session is restored.
+ *
+ * Solution: read `isHydrated` from the store. Guards render a blank
+ * screen until fetchMe() has finished, then evaluate auth state.
+ */
+function LoadingScreen() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: 'DM Sans, sans-serif',
+      color: '#7b829a',
+    }}>
+      Loading…
+    </div>
+  );
+}
+
 function RequireAuth() {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { isAuthenticated, isHydrated } = useAuthStore();
+  if (!isHydrated) return <LoadingScreen />;          // ← wait for hydration first
   return isAuthenticated ? <Outlet /> : <Navigate to='/login' replace />;
 }
 
 function RequireAdmin() {
-  const { isAuthenticated, user } = useAuthStore();
-  if (!isAuthenticated) return <Navigate to='/login' replace />;
-  if (user?.role !== 'admin') return <Navigate to='/' replace />;
+  const { isAuthenticated, user, isHydrated } = useAuthStore();
+  if (!isHydrated) return <LoadingScreen />;          // ← wait for hydration first
+  if (!isAuthenticated)       return <Navigate to='/login' replace />;
+  if (user?.role !== 'admin') return <Navigate to='/'      replace />;
   return <Outlet />;
 }
 
 function RedirectIfAuth() {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { isAuthenticated, isHydrated } = useAuthStore();
+  if (!isHydrated) return <LoadingScreen />;          // ← wait for hydration first
   return isAuthenticated ? <Navigate to='/' replace /> : <Outlet />;
 }
 
 // ─────────────────────────────────────────────────────────────
-// ROUTER CONFIG (Data Router API)
+// ROUTER
 // ─────────────────────────────────────────────────────────────
 
 const router = createBrowserRouter([
-  // ── PUBLIC STOREFRONT ROUTES ────────────────────────────────
+  // ── PUBLIC STOREFRONT ───────────────────────────────────────
   {
     element: <StorefrontLayout />,
     children: [
@@ -68,7 +98,6 @@ const router = createBrowserRouter([
       { path: 'products/:slug', element: <ProductDetailPage /> },
       { path: 'cart', element: <CartPage /> },
 
-      // Auth-required storefront routes
       {
         element: <RequireAuth />,
         children: [
@@ -82,7 +111,7 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ── AUTH PAGES (redirect if already logged in) ──────────────
+  // ── AUTH PAGES ──────────────────────────────────────────────
   {
     element: <RedirectIfAuth />,
     children: [
@@ -92,7 +121,7 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ── ADMIN ROUTES (protected by RequireAdmin) ────────────────
+  // ── ADMIN ───────────────────────────────────────────────────
   {
     element: <RequireAdmin />,
     children: [
@@ -104,6 +133,8 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <AdminDashboard /> },
           { path: 'analytics', element: <AdminAnalytics /> },
           { path: 'products', element: <AdminProducts /> },
+          { path: 'products/add', element: <AddProduct /> },           // BUG 3 FIX
+         // { path: 'products/edit/:id', element: <EditProduct /> },     // BUG 3 FIX
           { path: 'orders', element: <AdminOrders /> },
           { path: 'orders-list', element: <Orders /> },
           { path: 'users', element: <AdminUsers /> },
@@ -116,19 +147,23 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ── 404 FALLBACK ────────────────────────────────────────────
+  // ── 404 ─────────────────────────────────────────────────────
   { path: '*', element: <Navigate to='/' replace /> },
 ]);
 
+// ─────────────────────────────────────────────────────────────
+// APP
+// ─────────────────────────────────────────────────────────────
 
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
+  const setHydrated = useAuthStore((s) => s.setHydrated);
   const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
+    // fetchMe sets user + isAuthenticated, then marks isHydrated=true
+    // Guards wait for this before evaluating auth state
     fetchMe();
-
-    // Handle session expiry from API interceptor
     const handler = () => {
       logout();
       window.location.href = '/login?expired=1';
@@ -139,6 +174,7 @@ export default function App() {
 
   return (
     <>
+      
       <Toaster
         position='top-right'
         toastOptions={{
