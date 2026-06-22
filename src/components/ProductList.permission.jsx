@@ -3,7 +3,7 @@
 // Apply this pattern to your other admin pages (Orders, Customers, Reviews, Settings).
 
 import usePermission from '../../hooks/usePermission';
-import { PERMISSIONS } from '../../config/permissions';
+import { PERMISSIONS } from '../../hooks/permissions';
 
 // Inside the ProductList component, add:
 const { can } = usePermission();
