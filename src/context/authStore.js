@@ -51,6 +51,22 @@ const useAuthStore = create(
           return { success: false, error: msg };
         }
       },
+      
+      adminLogin: async (credentials) => {
+  set({ isLoading: true, error: null });
+  try {
+    const { data } = await authApi.adminLogin(credentials);
+    TokenStore.set(data.accessToken);
+    TokenStore.setRefresh(data.refreshToken);
+    set({ user: data.user, isAuthenticated: true, isLoading: false });
+    return { success: true };
+  } catch (err) {
+    const msg =
+      err?.response?.data?.message || 'Login failed. Check your admin credentials.';
+    set({ error: msg, isLoading: false });
+    return { success: false, error: msg };
+  }
+},
 
       register: async (data) => {
         set({ isLoading: true, error: null });

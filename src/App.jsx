@@ -22,6 +22,7 @@ import WishlistPage from '@/pages/WishlistPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 
 // Admin Pages
+import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminOrders from '@/pages/admin/AdminOrders';
@@ -123,13 +124,17 @@ const router = createBrowserRouter([
 
   // ── ADMIN ───────────────────────────────────────────────────
   {
+    path: 'admin-login',
+    element: <AdminLoginPage />,
+  },
+  {
     element: <RequireAdmin />,
     children: [
       {
         path: 'admin',
         element: <AdminLayout />,
         children: [
-          { index: true, element: <Navigate to='dashboard' replace /> },
+          { index: true, element: <Navigate to='dashboard' replace /> },         
           { path: 'dashboard', element: <AdminDashboard /> },
           { path: 'analytics', element: <AdminAnalytics /> },
           { path: 'products', element: <AdminProducts /> },

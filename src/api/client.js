@@ -124,6 +124,7 @@ export const getApiError = (err) =>
 export const auth = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
+  adminLogin: (data) => api.post('/auth/admin-login', data),
   refreshToken: (refreshToken) => api.post('/auth/refresh-token', { refreshToken }),
   verifyEmail: (token) => api.get(`/auth/verify-email/${token}`),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
