@@ -15,7 +15,7 @@ const NAV = [
   { to: '/admin/reviews',      icon: '⭐', label: 'Reviews',       badge: '3' },
   { to: '/admin/categories',   icon: '🏷️', label: 'Categories'               },
   { section: 'Admin' },
-  { to: '/admin/roles',     icon: '🔐', label: 'Admin Roles'                 },
+  { to: '/admin/users',     icon: '🔐', label: 'AdminUsers'                 },
   { to: '/admin/settings',  icon: '⚙️', label: 'Settings'                   },
 ];
 
@@ -51,14 +51,14 @@ export default function AdminLayout() {
   }
 
   function handleLogout() {
-    localStorage.removeItem('vitacore_token');
-    navigate('/login');
+    localStorage.removeItem('vc_access');
+    navigate('/admin-login');
   }
 
   // Get admin name from token
   let adminName = 'Admin';
   try {
-    const token = localStorage.getItem('vitacore_token');
+    const token = localStorage.getItem('vc_access');
     if (token) {
       const payload = JSON.parse(atob(token.split('.')[1]));
       adminName = payload.name ?? 'Admin';

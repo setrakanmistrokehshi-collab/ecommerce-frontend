@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '@/context/authStore';
+import { ROLES } from '@/constants/roles';
+
 
 export default function AdminLoginPage() {
   const navigate    = useNavigate();
@@ -12,15 +14,28 @@ export default function AdminLoginPage() {
 
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
+ 
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    clearError();
-    const result = await adminLogin({ email, password });
-    if (result.success) {
-      navigate('/admin');
-    }
+async function handleSubmit(e) {
+  e.preventDefault();
+  clearError();
+
+  const result = await adminLogin({ email, password });
+
+  if (!result.success) return;
+
+  const role = result.user?.role;
+
+  if (role === ROLES.ADMIN) {
+    navigate('/admin/dashboard');
+  } else if (role === ROLES.PRODUCT_MANAGER) {
+    navigate('/admin/products');
+  } else if (role === ROLES.ORDER_MANAGER) {
+    navigate('/admin/orders');
+  } else {
+    navigate('/admin/dashboard');
   }
+}
 
   return (
     <div style={styles.page}>

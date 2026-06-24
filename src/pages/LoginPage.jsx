@@ -24,7 +24,7 @@ function AuthShell({ title, subtitle, children }) {
         <div style={{ position: 'absolute', bottom: '15%', left: '-5%', width: 200, height: 200, borderRadius: '50%', background: 'rgba(200,133,74,0.15)' }} />
         <Link to='/' style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'var(--space-12)', position: 'relative' }}>
           <span style={{ fontSize: 32 }}>🌿</span>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--cream)', fontWeight: 700 }}>VitaCore</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--cream)', fontWeight: 700 }}>Winners Health</span>
         </Link>
         <div style={{ position: 'relative' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 36, color: 'var(--cream)', marginBottom: 16, lineHeight: 1.2 }}>

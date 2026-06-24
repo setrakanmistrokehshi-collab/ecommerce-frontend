@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { admin as adminApi } from '@/api/client';
 import { Pagination, Modal } from '@/components/ui';
+import { ROLES } from '../../constants/roles';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom'; // ✅ Added import
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
   const [items, setItems]   = useState([]);
   const [total, setTotal]   = useState(0);
   const [page, setPage]     = useState(1);
@@ -13,6 +16,7 @@ export default function AdminUsers() {
   const [search, setSearch] = useState('');
   const [role, setRole]     = useState('');
   const [selected, setSelected] = useState(null);
+  
 
   const fetch = useCallback(() => {
     setLoading(true);
@@ -43,6 +47,30 @@ export default function AdminUsers() {
     }
   };
 
+  // Helper function to get role display name
+  const getRoleDisplayName = (roleValue) => {
+    const roleMap = {
+      [ROLES.SUPER_ADMIN]: 'Super Admin',
+      [ROLES.PRODUCT_MANAGER]: 'Product Manager',
+      [ROLES.ORDER_MANAGER]: 'Order Manager',
+      [ROLES.SUPPORT]: 'Support Agent',
+      'customer': 'Customer', // Assuming 'customer' is a valid role
+    };
+    return roleMap[roleValue] || roleValue;
+  };
+
+  // Helper function to get role badge color
+  const getRoleBadgeStyle = (roleValue) => {
+    const styles = {
+      [ROLES.SUPER_ADMIN]: { background: 'rgba(200,133,74,0.15)', color: '#c8854a' },
+      [ROLES.PRODUCT_MANAGER]: { background: 'rgba(74,133,200,0.15)', color: '#4a85c8' },
+      [ROLES.ORDER_MANAGER]: { background: 'rgba(74,200,133,0.15)', color: '#4ac885' },
+      [ROLES.SUPPORT]: { background: 'rgba(200,74,133,0.15)', color: '#c84a85' },
+      'customer': { background: 'rgba(122,158,126,0.1)', color: '#7a9e7e' },
+    };
+    return styles[roleValue] || styles['customer'];
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       {/* Header */}
@@ -68,7 +96,10 @@ export default function AdminUsers() {
         >
           <option value=''>All Roles</option>
           <option value='customer'>Customer</option>
-          <option value='admin'>Admin</option>
+          <option value={ROLES.SUPER_ADMIN}>Super Admin</option>
+          <option value={ROLES.PRODUCT_MANAGER}>Product Manager</option>
+          <option value={ROLES.ORDER_MANAGER}>Order Manager</option>
+          <option value={ROLES.SUPPORT}>Support Agent</option>
         </select>
       </div>
 
@@ -93,85 +124,105 @@ export default function AdminUsers() {
                 <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: 'var(--admin-muted)' }}>Loading...</td></tr>
               ) : items.length === 0 ? (
                 <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: 'var(--admin-muted)' }}>No users found</td></tr>
-              ) : items.map((u) => (
-                <tr key={u._id}>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{
-                        width: 34, height: 34, borderRadius: '50%',
-                        background: u.role === 'admin' ? 'rgba(200,133,74,0.25)' : 'rgba(122,158,126,0.2)',
-                        color: u.role === 'admin' ? '#c8854a' : '#7a9e7e',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 700, fontSize: 14, flexShrink: 0,
-                      }}>
-                        {u.name?.[0]?.toUpperCase()}
+              ) : items.map((u) => {
+                const roleStyle = getRoleBadgeStyle(u.role);
+                const isAdmin = [ROLES.SUPER_ADMIN, ROLES.PRODUCT_MANAGER, ROLES.ORDER_MANAGER, ROLES.SUPPORT].includes(u.role);
+                
+                return (
+                  <tr key={u._id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: '50%',
+                          background: isAdmin ? 'rgba(200,133,74,0.25)' : 'rgba(122,158,126,0.2)',
+                          color: isAdmin ? '#c8854a' : '#7a9e7e',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontWeight: 700, fontSize: 14, flexShrink: 0,
+                        }}>
+                          {u.name?.[0]?.toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 500, fontSize: 14, color: 'var(--admin-text)' }}>{u.name}</div>
+                          <div style={{ fontSize: 12, color: 'var(--admin-muted)' }}>{u.email}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div style={{ fontWeight: 500, fontSize: 14, color: 'var(--admin-text)' }}>{u.name}</div>
-                        <div style={{ fontSize: 12, color: 'var(--admin-muted)' }}>{u.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ color: 'var(--admin-muted)', fontSize: 13 }}>{u.phone || '—'}</td>
-                  <td>
-                    <span style={{
-                      display: 'inline-block', padding: '2px 8px', borderRadius: 4,
-                      fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
-                      background: u.role === 'admin' ? 'rgba(200,133,74,0.15)' : 'rgba(122,158,126,0.1)',
-                      color: u.role === 'admin' ? '#c8854a' : '#7a9e7e',
-                    }}>
-                      {u.role}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    </td>
+                    <td style={{ color: 'var(--admin-muted)', fontSize: 13 }}>{u.phone || '—'}</td>
+                    <td>
                       <span style={{
-                        width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
-                        background: u.isEmailVerified ? '#7a9e7e' : '#fbbf24',
-                      }} />
-                      <span style={{ fontSize: 12, color: 'var(--admin-muted)' }}>
-                        {u.isEmailVerified ? 'Verified' : 'Unverified'}
+                        display: 'inline-block', padding: '2px 8px', borderRadius: 4,
+                        fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
+                        ...roleStyle,
+                      }}>
+                        {getRoleDisplayName(u.role)}
                       </span>
-                    </div>
-                  </td>
-                  <td style={{ color: 'var(--admin-muted)', fontSize: 13 }}>
-                    {u.createdAt ? format(new Date(u.createdAt), 'MMM d, yyyy') : '—'}
-                  </td>
-                  <td style={{ color: 'var(--admin-muted)', fontSize: 13 }}>
-                    {u.lastLogin ? format(new Date(u.lastLogin), 'MMM d') : 'Never'}
-                  </td>
-                  <td>
-                    <span style={{
-                      display: 'inline-block', padding: '2px 8px', borderRadius: 4,
-                      fontSize: 11, fontWeight: 600,
-                      background: u.isActive ? 'rgba(122,158,126,0.15)' : 'rgba(248,113,113,0.15)',
-                      color: u.isActive ? '#7a9e7e' : '#f87171',
-                    }}>
-                      {u.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      <button
-                        onClick={() => setSelected(u)}
-                        style={{ padding: '3px 8px', background: 'rgba(122,158,126,0.1)', color: '#7a9e7e', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => toggleStatus(u)}
-                        style={{
-                          padding: '3px 8px', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12,
-                          background: u.isActive ? 'rgba(248,113,113,0.1)' : 'rgba(122,158,126,0.1)',
-                          color: u.isActive ? '#f87171' : '#7a9e7e',
-                        }}
-                      >
-                        {u.isActive ? 'Disable' : 'Enable'}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{
+                          width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                          background: u.isEmailVerified ? '#7a9e7e' : '#fbbf24',
+                        }} />
+                        <span style={{ fontSize: 12, color: 'var(--admin-muted)' }}>
+                          {u.isEmailVerified ? 'Verified' : 'Unverified'}
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ color: 'var(--admin-muted)', fontSize: 13 }}>
+                      {u.createdAt ? format(new Date(u.createdAt), 'MMM d, yyyy') : '—'}
+                    </td>
+                    <td style={{ color: 'var(--admin-muted)', fontSize: 13 }}>
+                      {u.lastLogin ? format(new Date(u.lastLogin), 'MMM d') : 'Never'}
+                    </td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block', padding: '2px 8px', borderRadius: 4,
+                        fontSize: 11, fontWeight: 600,
+                        background: u.isActive ? 'rgba(122,158,126,0.15)' : 'rgba(248,113,113,0.15)',
+                        color: u.isActive ? '#7a9e7e' : '#f87171',
+                      }}>
+                        {u.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button
+                          onClick={() => setSelected(u)}
+                          style={{ padding: '3px 8px', background: 'rgba(122,158,126,0.1)', color: '#7a9e7e', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => toggleStatus(u)}
+                          style={{
+                            padding: '3px 8px', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 12,
+                            background: u.isActive ? 'rgba(248,113,113,0.1)' : 'rgba(122,158,126,0.1)',
+                            color: u.isActive ? '#f87171' : '#7a9e7e',
+                          }}
+                        >
+                          {u.isActive ? 'Disable' : 'Enable'}
+                        </button>
+
+                          {/* 👇  EDIT ROLE BUTTON */}
+    <button
+      onClick={() => navigate(`/admin/users/${u._id}/role`, { state: { user: u } })}
+      style={{
+        padding: '3px 8px',
+        border: 'none',
+        borderRadius: 4,
+        cursor: 'pointer',
+        fontSize: 12,
+        background: 'rgba(74,133,200,0.1)',
+        color: '#4a85c8',
+      }}
+    >
+      Edit Role
+    </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -199,7 +250,9 @@ export default function AdminUsers() {
                 <div style={{ fontSize: 14, color: 'var(--muted)' }}>{selected.email}</div>
                 <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                   <span className={`badge ${selected.isActive ? 'badge-green' : 'badge-red'}`}>{selected.isActive ? 'Active' : 'Inactive'}</span>
-                  <span className={`badge ${selected.role === 'admin' ? 'badge-amber' : 'badge-gray'}`}>{selected.role}</span>
+                  <span className={`badge ${selected.role === ROLES.SUPER_ADMIN ? 'badge-amber' : 'badge-gray'}`}>
+                    {getRoleDisplayName(selected.role)}
+                  </span>
                   {selected.isEmailVerified && <span className='badge badge-green'>Verified</span>}
                 </div>
               </div>

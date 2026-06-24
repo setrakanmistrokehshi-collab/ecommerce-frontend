@@ -16,8 +16,8 @@ export default function Settings() {
   const [tab, setTab]       = useState('store');
   const [saving, setSaving] = useState(false);
   const [form, setForm]     = useState({
-    storeName:   'VitaCore Health',
-    storeEmail:  'admin@vitacore.ng',
+    storeName:   'winners Health',
+    storeEmail:  'admin@winnershealth.ng',
     storePhone:  '+234 800 000 0000',
     storeAddress:'Lagos, Nigeria',
     currency:    'NGN (₦)',
@@ -74,8 +74,8 @@ export default function Settings() {
               <div className="card">
                 <div className="card-title" style={{ marginBottom: 16 }}>Store Information</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <F label="Store Name"    value={form.storeName}    onChange={v => set('storeName', v)}    placeholder="VitaCore Health"/>
-                  <F label="Store Email"   value={form.storeEmail}   onChange={v => set('storeEmail', v)}   type="email" placeholder="admin@vitacore.ng"/>
+                  <F label="Store Name"    value={form.storeName}    onChange={v => set('storeName', v)}    placeholder="Winners Health"/>
+                  <F label="Store Email"   value={form.storeEmail}   onChange={v => set('storeEmail', v)}   type="email" placeholder="admin@winnershealth.ng"/>
                   <F label="Support Phone" value={form.storePhone}   onChange={v => set('storePhone', v)}   placeholder="+234 800 000 0000"/>
                   <F label="Store Address" value={form.storeAddress} onChange={v => set('storeAddress', v)} placeholder="Lagos, Nigeria"/>
                   <F label="Currency"      value={form.currency}     onChange={v => set('currency', v)}     placeholder="NGN (₦)"/>

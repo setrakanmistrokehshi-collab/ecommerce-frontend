@@ -14,17 +14,10 @@ import axios from 'axios';
 // ── Base URL ──────────────────────────────────────────────────────
 // IMPORTANT: VITE_API_BASE_URL should be the ROOT origin only
 
-// (the old file appended /api/v1 on top of an already-/api/v1 base,
-// producing /api/v1/api/v1/... — double check your .env value!)
-const ROOT_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const ROOT_URL = import.meta.env.VITE_API_BASE_URL;
 const API_V1 = `${ROOT_URL}/api/v1`;
 
-// ── Token storage ─────────────────────────────────────────────────
-// NOTE: This is now the ONLY token storage scheme. The old adminApi.js
-// used a separate key ('vitacore_token') — that is gone. If any admin
-// component reads localStorage.getItem('vitacore_token') directly,
-// update it to use TokenStore.get() instead, or login will silently
-// "work" but every admin request will be unauthenticated.
+// ── Token storage ────────────────────────────────────────
 const TokenStore = {
   get: () => localStorage.getItem('vc_access'),
   set: (t) => localStorage.setItem('vc_access', t),
@@ -136,11 +129,7 @@ export const auth = {
 
 // ═══════════════════════════════════════════════════════════════════
 // PRODUCTS  /products
-// ═══════════════════════════════════════════════════════════════════
-// ⚠️ CONFLICT: old apiClient used PATCH for admin update,
-// adminApi.js used PUT. Pick ONE based on what your backend route
-// actually registers (router.patch vs router.put) and delete the other.
-// PATCH kept here as the default — change to api.put(...) if your
+// ═════════════════════════════════════════════════════════
 // backend expects PUT.
 export const products = {
   list: (params) => api.get('/products', { params }),
@@ -152,8 +141,6 @@ export const products = {
   update: (id, data) => api.patch(`/products/${id}`, data), // ⚠️ verify PATCH vs PUT
   delete: (id) => api.delete(`/products/${id}`),
   // Image upload — multipart/form-data
-  // axios + FormData: DO NOT set Content-Type manually, override the
-  // instance default to undefined so the browser sets the boundary.
   uploadImage: (id, formData) =>
     api.post(`/products/${id}/images`, formData, {
       headers: { 'Content-Type': undefined },
@@ -163,11 +150,7 @@ export const products = {
 // ═══════════════════════════════════════════════════════════════════
 // ORDERS  /orders
 // ═══════════════════════════════════════════════════════════════════
-// ⚠️ CONFLICT: old apiClient's admin list is all() -> /orders/admin/all
-// adminApi.js's getOrders(params) hits /orders with query params.
-// These may be the SAME endpoint with different routing on the backend,
-// or two genuinely different routes. Confirm against your routes file —
-// I've kept both below but all() and adminList() should likely
+// ⚠️ CONFLICT: old apiClient's admin list is all() -> /order
 // collapse into one once you check.
 export const orders = {
   myOrders: () => api.get('/orders'),
@@ -204,18 +187,7 @@ export const users = {
 
 // ═══════════════════════════════════════════════════════════════════
 // ADMIN  /admin
-// ═══════════════════════════════════════════════════════════════════
-// ⚠️ CONFLICT: old apiClient had dashboard()->/admin/dashboard +
-// revenueAnalytics()->/admin/analytics/revenue + topProducts()->
-// /admin/analytics/top-products.
-// adminApi.js had getDashboardStats()->/admin/stats +
-// getRevenueReport()->/admin/reports/revenue + getTopProducts()->
-// /admin/reports/top-products.
-// These are almost certainly the SAME backend feature under two
-// different route prefixes (/analytics vs /reports, /dashboard vs
-// /stats). Check your backend admin.routes.js and keep ONE set —
-// I've kept both names below as aliases pointing at the OLD paths;
-// rename/remove once you've confirmed which prefix the backend uses.
+// ═════════════════════════════════════════════════════════════
 export const admin = {
   dashboard: () => api.get('/admin/stats'),       // ⚠️ vs '/admin/stats'
   revenueAnalytics: (months) => api.get('/admin/reports/revenue', { params: { months } }), // ⚠️ vs '/admin/reports/revenue'
@@ -226,6 +198,9 @@ export const admin = {
   allUsers: (params) => api.get('/admin/users', { params }),
   toggleUserStatus: (id) => api.patch(`/admin/users/${id}/status`),
   getCustomerById: (id) => api.get(`/admin/users/${id}`), // from adminApi.js
+
+  updateUserRole: (id, role) =>
+    api.patch(`/admin/users/${id}/role`, { role }).then((r) => r.data),
 
   // Products
   updateStock: (id, stock) => api.patch(`/admin/products/${id}/stock`, { stock }),

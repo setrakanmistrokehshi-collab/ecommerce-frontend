@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import useFetch from '../../hooks/useFetch';
-import { admin, orders } from '../../api/client';
+import { admin, orders as ordersApi } from '../../api/client';
 
 // ── Fallback data shown while API loads or if endpoint not yet built ──
 const FALLBACK_STATS = {
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
 
   // Live data from your backend — falls back to static data on error
   const { data: statsData } = useFetch(admin.dashboard);
-  const { data: ordersData } = useFetch(orders);
+  const { data: ordersData } = useFetch(ordersApi);
 
   const stats     = statsData ?? FALLBACK_STATS;
   const orders    = ordersData?.orders ?? FALLBACK_ORDERS;
