@@ -1,9 +1,10 @@
-/**
- * Auth Store — Zustand with localStorage persistence
- */
+// src/context/authStore.js
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { auth as authApi, TokenStore } from '@/api/client';
+import { AUTO_LOGOUT_CONFIG } from '@/config/autoLogout';
+
+const AUTO_LOGOUT_MINUTES = AUTO_LOGOUT_CONFIG.minutes;
 
 const useAuthStore = create(
   persist(
@@ -13,6 +14,11 @@ const useAuthStore = create(
       isHydrated: false,
       isLoading: false,
       error: null,
+      
+      // Auto-logout state
+      autoLogoutTimer: null,
+      isAutoLogoutActive: false,
+      secondsUntilAutoLogout: 0,
 
       setUser: (user) =>
         set({
@@ -53,24 +59,27 @@ const useAuthStore = create(
       },
       
       adminLogin: async (credentials) => {
-  set({ isLoading: true, error: null });
-  try {
-    const { data } = await authApi.adminLogin(credentials);
-    TokenStore.set(data.accessToken);
-    TokenStore.setRefresh(data.refreshToken);
-    set({ user: data.user,
-       isAuthenticated: true,
-        isLoading: false });
-    return {
-       success: true, 
-       user: data.user };
-  } catch (err) {
-    const msg =
-      err?.response?.data?.message || 'Login failed. Check your admin credentials.';
-    set({ error: msg, isLoading: false });
-    return { success: false, error: msg };
-  }
-},
+        set({ isLoading: true, error: null });
+        try {
+          const { data } = await authApi.adminLogin(credentials);
+          TokenStore.set(data.accessToken);
+          TokenStore.setRefresh(data.refreshToken);
+          set({ 
+            user: data.user,
+            isAuthenticated: true,
+            isLoading: false 
+          });
+          return {
+            success: true, 
+            user: data.user 
+          };
+        } catch (err) {
+          const msg =
+            err?.response?.data?.message || 'Login failed. Check your admin credentials.';
+          set({ error: msg, isLoading: false });
+          return { success: false, error: msg };
+        }
+      },
 
       register: async (data) => {
         set({ isLoading: true, error: null });
@@ -110,6 +119,9 @@ const useAuthStore = create(
           // ignore
         }
 
+        // Clear auto-logout timer
+        get().clearAutoLogoutTimer();
+
         TokenStore.clear();
 
         set({
@@ -118,7 +130,88 @@ const useAuthStore = create(
           isHydrated: true,
           isLoading: false,
           error: null,
+          isAutoLogoutActive: false,
+          secondsUntilAutoLogout: 0,
         });
+      },
+
+      // Start auto-logout timer
+      startAutoLogoutTimer: () => {
+        const { isAuthenticated, autoLogoutTimer, clearAutoLogoutTimer } = get();
+        
+        // Only start if user is authenticated and timer not already running
+        if (!isAuthenticated || autoLogoutTimer) return;
+
+        console.log(`🔄 Auto-logout timer started - will logout in ${AUTO_LOGOUT_MINUTES} minutes`);
+
+        // Clear any existing timer first
+        clearAutoLogoutTimer();
+
+        // Set initial state
+        set({
+          isAutoLogoutActive: true,
+          secondsUntilAutoLogout: AUTO_LOGOUT_MINUTES * 60,
+        });
+
+        // Start countdown updates
+        const countdownInterval = setInterval(() => {
+          const { secondsUntilAutoLogout, logout } = get();
+          
+          if (secondsUntilAutoLogout <= 1) {
+            // Time's up - logout
+            console.log('⏰ Auto-logout triggered - tab inactive too long');
+            clearInterval(countdownInterval);
+            logout();
+            // Show notification to user
+            if (typeof window !== 'undefined') {
+              alert('You have been automatically logged out due to tab inactivity.');
+            }
+            return;
+          }
+
+          set({
+            secondsUntilAutoLogout: secondsUntilAutoLogout - 1,
+          });
+        }, AUTO_LOGOUT_CONFIG.checkInterval);
+
+        // Store the interval ID
+        set({ autoLogoutTimer: countdownInterval });
+      },
+
+      // Cancel auto-logout timer
+      cancelAutoLogout: () => {
+        const { autoLogoutTimer } = get();
+        
+        if (autoLogoutTimer) {
+          console.log('🔄 Auto-logout cancelled - user returned to tab');
+          clearInterval(autoLogoutTimer);
+          set({
+            autoLogoutTimer: null,
+            isAutoLogoutActive: false,
+            secondsUntilAutoLogout: 0,
+          });
+        }
+      },
+
+      // Clear auto-logout timer (internal use)
+      clearAutoLogoutTimer: () => {
+        const { autoLogoutTimer } = get();
+        if (autoLogoutTimer) {
+          clearInterval(autoLogoutTimer);
+          set({
+            autoLogoutTimer: null,
+            isAutoLogoutActive: false,
+            secondsUntilAutoLogout: 0,
+          });
+        }
+      },
+
+      // Get formatted time remaining
+      getAutoLogoutTimeRemaining: () => {
+        const { secondsUntilAutoLogout } = get();
+        const minutes = Math.floor(secondsUntilAutoLogout / 60);
+        const seconds = secondsUntilAutoLogout % 60;
+        return `${minutes}:${String(seconds).padStart(2, '0')}`;
       },
 
       // Validate token and refresh user data
@@ -141,7 +234,6 @@ const useAuthStore = create(
           }
 
           const { data } = await authApi.me();
-          
 
           set({
             user: data.user,
@@ -171,6 +263,7 @@ const useAuthStore = create(
       // Persist only user information
       partialize: (state) => ({
         user: state.user,
+        // Don't persist auto-logout state
       }),
     }
   )

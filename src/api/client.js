@@ -191,7 +191,7 @@ export const users = {
 export const admin = {
   dashboard: () => api.get('/admin/stats'),       // ⚠️ vs '/admin/stats'
   revenueAnalytics: (months) => api.get('/admin/reports/revenue', { params: { months } }), // ⚠️ vs '/admin/reports/revenue'
-  topProducts: () => api.get('/admin/reports/top-products'),   // ⚠️ vs '/admin/reports/top-products'
+  topProducts: () => api.get('/admin/reports/top-products'),   // ⚠️ '/admin/reports/top-products'
   categoryAnalytics: () => api.get('/admin/stats/categoryBreakdown'),
 
   // Users / Customers
@@ -200,7 +200,7 @@ export const admin = {
   getCustomerById: (id) => api.get(`/admin/users/${id}`), // from adminApi.js
 
   updateUserRole: (id, role) =>
-    api.patch(`/admin/users/${id}/role`, { role }).then((r) => r.data),
+    api.put(`/admin/users/${id}/role`, { role }).then((r) => r.data),
 
   // Products
   updateStock: (id, stock) => api.patch(`/admin/products/${id}/stock`, { stock }),
@@ -218,6 +218,15 @@ export const admin = {
 
   // Orders
   notifyShipped: (id) => api.post(`/admin/orders/${id}/notify-shipped`),
+   
+  // Categories - using the routes from your backend
+  getCategories: () => api.get('/categories'),  // Public route
+  getAdminCategories: (includeInactive) => 
+    api.get('/admin/categories', { params: { includeInactive } }),  // Admin route
+  
+  createCategory: (data) => api.post('/admin/categories', data),
+  updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
+  deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
 };
 
 export default api;

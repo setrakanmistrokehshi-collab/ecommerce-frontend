@@ -1,6 +1,6 @@
 // src/pages/admin/Settings.jsx
 import { useState } from 'react';
-import { useToast } from '../../hooks/ToastContext';
+import toast from 'react-hot-toast';
 
 const TABS = [
   { id: 'store',         icon: '🏪', label: 'Store'         },
@@ -12,10 +12,11 @@ const TABS = [
 ];
 
 export default function Settings() {
-  const toast     = useToast();
+
   const [tab, setTab]       = useState('store');
   const [saving, setSaving] = useState(false);
   const [form, setForm]     = useState({
+
     storeName:   'winners Health',
     storeEmail:  'admin@winnershealth.ng',
     storePhone:  '+234 800 000 0000',
@@ -35,12 +36,15 @@ export default function Settings() {
 
   async function save() {
     setSaving(true);
-    // POST to /api/v1/admin/settings when endpoint exists
-    await new Promise(r => setTimeout(r, 800));
-    toast('Settings saved ✅');
-    setSaving(false);
+    try {
+      await new Promise(r => setTimeout(r, 800));
+      toast.success('Settings saved');
+    } catch (err) {
+      toast.error('Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
   }
-
   return (
     <>
       <div className="page-header">

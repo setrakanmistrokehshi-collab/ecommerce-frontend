@@ -13,6 +13,9 @@ import { ROLES } from '@/constants/roles';
 import StorefrontLayout from '@/components/layout/StorefrontLayout';
 import AdminLayout from '@/components/layout/AdminLayout';
 
+import { AutoLogoutManager } from './components/AutoLogoutManager';
+import { AutoLogoutCountdown } from './components/AutoLogoutCountdown';
+
 // Pages (storefront)
 import HomePage from '@/pages/HomePage';
 import ProductsPage from '@/pages/ProductsPage';
@@ -39,6 +42,7 @@ import Customers from '@/pages/admin/Customers';
 import Orders from '@/pages/admin/Orders';
 import Reports from '@/pages/admin/Reports';
 import Reviews from '@/pages/admin/Reviews';
+import Categories from '@/pages/admin/Categories';
 import EditUserRole from '@/pages/admin/EditUserRole';
 import Settings from '@/pages/admin/Settings';
 
@@ -179,6 +183,7 @@ const router = createBrowserRouter([
           { path: 'customers', element: <Customers /> },
           { path: 'reports', element: <Reports /> },
           { path: 'reviews', element: <Reviews /> },
+          { path: 'categories', element: <Categories /> },
           { path: 'settings', element: <Settings /> },
         ],
       },
@@ -194,6 +199,7 @@ const router = createBrowserRouter([
 export default function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const logout = useAuthStore((s) => s.logout);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   useEffect(() => {
     fetchMe();
@@ -210,6 +216,15 @@ export default function App() {
   return (
     <>
       <Toaster position="top-right" />
+      
+      {/* 👇 ADD AUTO-LOGOUT COMPONENTS HERE - ONLY WHEN AUTHENTICATED */}
+      {isAuthenticated && (
+        <>
+          <AutoLogoutManager />
+          <AutoLogoutCountdown />
+        </>
+      )}
+      
       <RouterProvider router={router} />
     </>
   );
