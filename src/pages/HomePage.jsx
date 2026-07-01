@@ -25,18 +25,24 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className='hero-section' style={{
-        background: 'linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 60%, var(--sage-dark) 100%)',
-        minHeight: '88vh',
-        display: 'flex', alignItems: 'center',
-        position: 'relative', overflow: 'hidden',
-      }}>
+     <section className='hero-section' style={{
+  background: `
+    linear-gradient(135deg, rgba(3, 44, 20, 0.85) 0%, rgba(4, 58, 31, 0.5) 50%, rgba(10,30,20,0.7) 100%),
+    url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80')
+  `,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  minHeight: '88vh',
+  display: 'flex', 
+  alignItems: 'center',
+  position: 'relative', 
+  overflow: 'hidden',
+}}>
         {/* Decorative orbs */}
         <div className='hero-orb-1' style={{
           position: 'absolute', top: '15%', right: '8%',
           width: 400, height: 400, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(122,158,126,0.3) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(59, 155, 70, 0.3) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div className='hero-orb-2' style={{
@@ -75,7 +81,7 @@ export default function HomePage() {
               lineHeight: 1.7, maxWidth: 520, marginBottom: 'var(--space-8)',
               animationDelay: '160ms',
             }}>
-              Science-backed supplements formulated for modern Nigerian lifestyles.
+              Science-backed supplements formulated for healthy lifestyles.
               Premium quality, transparent ingredients, measurable results.
             </p>
 
@@ -97,9 +103,9 @@ export default function HomePage() {
               animationDelay: '320ms',
             }}>
               {[
-                { n: '50,000+', l: 'Happy Customers' },
+                { n: '5,000+', l: 'Happy Customers' },
                 { n: '100%', l: 'Natural Ingredients' },
-                { n: '24hr', l: 'Delivery in Lagos' },
+                { n: '24hr', l: 'Delivery in Lagos, Owerri, Port Harcourt' },
               ].map((t) => (
                 <div key={t.n}>
                   <div className='hero-stat-num' style={{ fontSize: 22, fontWeight: 700, color: 'var(--cream)', fontFamily: 'var(--font-display)' }}>{t.n}</div>
@@ -188,7 +194,7 @@ export default function HomePage() {
       <section className='section-pad' style={{ padding: 'var(--space-20) 0', background: 'var(--forest)' }}>
         <div className='container' style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 32, color: 'var(--cream)', marginBottom: 12 }}>
-            Join 50,000+ Wellness Subscribers
+            Join 5,000+ Wellness Subscribers
           </h2>
           <p style={{ color: 'var(--sage-light)', marginBottom: 'var(--space-6)', lineHeight: 1.7 }}>
             Get exclusive deals, new product launches, and wellness tips delivered weekly.

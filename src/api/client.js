@@ -199,8 +199,8 @@ export const admin = {
   toggleUserStatus: (id) => api.patch(`/admin/users/${id}/status`),
   getCustomerById: (id) => api.get(`/admin/users/${id}`), // from adminApi.js
 
-  updateUserRole: (id, role) =>
-    api.put(`/admin/users/${id}/role`, { role }).then((r) => r.data),
+   updateUserRole: (id, data) =>
+    api.patch(`/admin/users/${id}/role`, data),
 
   // Products
   updateStock: (id, stock) => api.patch(`/admin/products/${id}/stock`, { stock }),

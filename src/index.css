@@ -14,9 +14,9 @@
   --rust: #b85c38;
   --charcoal: #2c2c2c;
   --muted: #7a7065;
-  --border: #d8cec2;
+  --border: #f3f0ec;
   --border-light: #ece6dc;
-  --white: #ffffff;
+  --white: hsl(0, 23%, 94%);
   --error: #c0392b;
   --success: #27ae60;
   --warning: #e67e22;
@@ -26,7 +26,7 @@
   --admin-surface: #1a1d27;
   --admin-card: #22263a;
   --admin-border: #2e3348;
-  --admin-text: #e2e8f0;
+  --admin-text: #02080e;
   --admin-muted: #8892a4;
   --admin-accent: #7a9e7e;
   --admin-amber: #c8854a;
