@@ -228,8 +228,8 @@ export const admin = {
   updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
   // ✅ correct — auth router handles this
-  changePassword: (data) => api.patch('/auth/change-password', data),
-  changeAdminPassword: (data) => api.patch('/admin/settings/password', data),
+  changePassword: (data) => api.put('/admin/change-password', data),
+  changeAdminPassword: (data) => api.put('/admin/settings/password', data),
 };
 
 export default api;
