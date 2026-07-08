@@ -11,6 +11,7 @@
     "lint:fix": "eslint src --ext .js,.jsx --fix"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.2",
     "axios": "^1.11.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
