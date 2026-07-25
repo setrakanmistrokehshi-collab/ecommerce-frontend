@@ -81,12 +81,12 @@ export default function AdminDashboard() {
   const { data: statsData } = useFetch(admin.dashboard);
   const { data: ordersData } = useFetch(ordersApi);
 
-  const stats     = statsData ?? FALLBACK_STATS;
-  const orders    = ordersData?.orders ?? FALLBACK_ORDERS;
-  const salesData = statsData?.salesChart ?? FALLBACK_SALES;
-  const catData   = statsData?.categoryBreakdown ?? FALLBACK_CATEGORIES;
-  const topProds  = statsData?.topProducts ?? FALLBACK_TOP;
-  const inventory = statsData?.inventory ?? FALLBACK_INVENTORY;
+  const stats     = statsData ?? {};
+  const orders    = ordersData?.orders ?? [];
+  const salesData = statsData?.salesChart ??  [];
+  const catData   = statsData?.categoryBreakdown ?? [];
+  const topProds  = statsData?.topProducts ?? [];
+  const inventory = statsData?.inventory ?? [];
 
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 

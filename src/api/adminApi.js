@@ -60,6 +60,15 @@ export const uploadProductImage = (id, formData) =>
 export const updateProductStock = (id, stock) =>
   api.patch(`/admin/products/${id}/stock`, { stock }).then(r => r.data);
 
+
+// ✅ ADD THIS: Delete product image
+export const deleteProductImage = async (id, imageUrl) => {
+  const response = await api.delete(`/products/${id}/images`, {
+    data: { imageUrl },
+  });
+  return response.data;
+};
+
 // ── CUSTOMERS ────────────────────────────────────────────────────
 export const getCustomers = (params = {}) =>
   api.get('/admin/users', { params }).then(r => r.data);

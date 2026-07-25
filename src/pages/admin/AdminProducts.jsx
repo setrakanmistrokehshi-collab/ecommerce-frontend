@@ -106,8 +106,9 @@ export default function AdminProducts() {
                         fontSize: 18, flexShrink: 0,
                         overflow: 'hidden',
                       }}>
-                        {p.images?.[0]
-                          ? <img src={p.images[0]} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                       
+                        {p.thumbnail || p.images?.[0]
+                          ? <img src={p.thumbnail || p.images[0]} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           : p.emoji || '💊'}
                       </div>
                       <div>
@@ -218,6 +219,14 @@ export default function AdminProducts() {
   );
 }
 
+function parseImageInput(value) {
+  if (!value) return [];
+  return value
+    .split(/[\n,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 // ── Product Create/Edit Modal ─────────────────────────────────────
 function ProductModal({ item, onClose, onSaved }) {
   const isEdit = !!item?._id;
@@ -234,6 +243,7 @@ function ProductModal({ item, onClose, onSaved }) {
       featured:      item?.featured || false,
       benefits:      item?.benefits?.join('\n') || '',
       howToUse:      item?.howToUse || '',
+     
       images:        item?.images?.join('\n') || '',
     },
   });
@@ -245,7 +255,7 @@ function ProductModal({ item, onClose, onSaved }) {
       originalPrice: data.originalPrice ? Number(data.originalPrice) : undefined,
       stock:         Number(data.stock),
       benefits:      data.benefits ? data.benefits.split('\n').filter(Boolean) : [],
-      images:        data.images ? data.images.split('\n').filter(Boolean) : [],
+      images:        parseImageInput(data.images),
     };
     try {
       if (isEdit) {
@@ -313,8 +323,17 @@ function ProductModal({ item, onClose, onSaved }) {
         </div>
 
         <div>
-          <label className='label'>Image URLs (one per line)</label>
-          <textarea className='input' rows={2} placeholder='https://example.com/image1.jpg' style={{ resize: 'vertical' }} {...register('images')} />
+          <label className='label'>Image URLs (one per line, or comma-separated)</label>
+          <textarea
+            className='input'
+            rows={3}
+            placeholder={'https://res.cloudinary.com/.../image1.jpg\nhttps://res.cloudinary.com/.../image2.jpg\n\nor: url1, url2, url3'}
+            style={{ resize: 'vertical' }}
+            {...register('images')}
+          />
+          <div style={{ fontSize: 11, color: 'var(--admin-muted)', marginTop: 4 }}>
+            Paste one link per line, or separate multiple links with commas — both work now.
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

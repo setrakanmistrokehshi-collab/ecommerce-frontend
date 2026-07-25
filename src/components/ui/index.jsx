@@ -14,6 +14,7 @@ export function ProductCard({ product, delay = 0 }) {
 
   const handleWishlist = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isAuthenticated) { toast.error('Login to save wishlist'); return; }
     try {
       await usersApi.toggleWishlist(product._id);
@@ -26,6 +27,7 @@ export function ProductCard({ product, delay = 0 }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setAdding(true);
     addItem(product);
     toast.success(`${product.emoji || '💊'} Added to cart`);
@@ -92,7 +94,7 @@ export function ProductCard({ product, delay = 0 }) {
           style={{
             position: 'absolute', top: 10, right: 10,
             width: 32, height: 32, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.9)',
+            background: 'rgba(255, 255, 255, 0.99)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: 'none', cursor: 'pointer', fontSize: 16,
             transition: 'transform 0.2s',

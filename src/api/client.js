@@ -8,7 +8,7 @@ const API_V1 = `${ROOT_URL}/api/v1`;
 // ── Token storage ────────────────────────────────────────────────
 const TokenStore = {
   get: () => localStorage.getItem('vc_access'),
-  set: (t) => localStorage.setItem('vc_access', t),
+   set: (t) => localStorage.setItem('vc_access', t),
   getRefresh: () => localStorage.getItem('vc_refresh'),
   setRefresh: (t) => localStorage.setItem('vc_refresh', t),
   clear: () => {
@@ -116,7 +116,7 @@ api.interceptors.response.use(
         processQueue(null, newToken);
         original.headers.Authorization = `Bearer ${newToken}`;
         return api(original);
-      } catch (refreshError) {
+   } catch (refreshError) {
         processQueue(refreshError, null);
         TokenStore.clear();
         window.dispatchEvent(new CustomEvent('vc:session-expired'));

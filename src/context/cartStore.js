@@ -9,6 +9,7 @@ const useCartStore = create(
       addItem: (product, quantity = 1) => {
         const { items } = get();
         const existing = items.find((i) => i._id === product._id);
+
         if (existing) {
           set({
             items: items.map((i) =>
@@ -18,15 +19,21 @@ const useCartStore = create(
             ),
           });
         } else {
-          set({ items: [...items, { ...product, quantity }] });
+          set({
+            items: [...items, { ...product, quantity }],
+          });
         }
       },
 
-      removeItem: (id) =>
-        set({ items: get().items.filter((i) => i._id !== id) }),
+      removeItem: (id) => {
+        set({ items: get().items.filter((i) => i._id !== id) });
+      },
 
       updateQty: (id, qty) => {
-        if (qty < 1) return get().removeItem(id);
+        if (qty < 1) {
+          get().removeItem(id);
+          return;
+        }
         set({
           items: get().items.map((i) =>
             i._id === id ? { ...i, quantity: qty } : i
@@ -35,17 +42,18 @@ const useCartStore = create(
       },
 
       clear: () => set({ items: [] }),
-
-      get total() {
-        return get().items.reduce((s, i) => s + i.price * i.quantity, 0);
-      },
-
-      get count() {
-        return get().items.reduce((s, i) => s + i.quantity, 0);
-      },
     }),
-    { name: 'winners-cart' }
+    {
+      name: 'winners-cart',
+    }
   )
 );
 
 export default useCartStore;
+
+// ── Helper selectors (use these in components) ───────────────────
+export const selectCartCount = (state) =>
+  state.items.reduce((sum, item) => sum + item.quantity, 0);
+
+export const selectCartTotal = (state) =>
+  state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);

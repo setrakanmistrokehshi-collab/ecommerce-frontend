@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '@/context/authStore';
-import useCartStore from '@/context/cartStore';
+import useCartStore, { selectCartCount } from '@/context/cartStore';
 import toast from 'react-hot-toast';
 
 export default function StorefrontLayout() {
   const { user, isAuthenticated, logout } = useAuthStore();
-  const count = useCartStore((s) => s.count);
+  const count = useCartStore(selectCartCount);
+  
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,6 +27,7 @@ export default function StorefrontLayout() {
     navigate('/');
   };
 
+  
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* ── Navbar ─────────────────────────────────────────────── */}
@@ -243,7 +245,7 @@ export default function StorefrontLayout() {
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             fontSize: 13, color: 'var(--sage-light)',
           }}>
-            <span>© {new Date().getFullYear()} VitaCore Health. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Winners Health. All rights reserved.</span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>v1.0.0</span>
           </div>
         </div>
