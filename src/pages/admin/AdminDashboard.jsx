@@ -120,7 +120,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 16, marginBottom: 24 }}>
+      <div className="charts-row">
 
         {/* Revenue area chart */}
         <div className="card">
@@ -185,14 +185,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="stats-strip">
         <StatStrip emoji="📬" label="Pending Orders"  value={stats.pendingOrders} color="var(--warn)"   sub="Awaiting fulfillment"/>
         <StatStrip emoji="❌" label="Cancelled"        value={stats.cancelled}     color="var(--danger)" sub="▲ 1.6% this week"/>
         <StatStrip emoji="💹" label="Net Profit"       value={stats.netProfit}     color="var(--accent)" sub={`Margin: ${stats.margin}`}/>
       </div>
 
       {/* Bottom row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div className="bottom-row">
 
         {/* Recent Orders */}
         <div className="card">

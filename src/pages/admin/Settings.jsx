@@ -258,14 +258,10 @@ export default function Settings() {
         </button>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '200px 1fr', 
-        gap: 20, 
-        alignItems: 'start' 
-      }}>
+      <div className="settings-layout">
         {/* Tab nav */}
-        <div className="card" style={{ padding: 8, position: 'sticky', top: 20 }}>
+        <div className="card settings-tabs" style={{ padding:8 }}>
+
           {TABS.map(t => (
             <div
               key={t.id}
@@ -307,7 +303,7 @@ export default function Settings() {
             <>
               <div className="card">
                 <div className="card-title" style={{ marginBottom: 16 }}>Store Information</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-grid-2">
                   <FormField 
                     label="Store Name" 
                     value={form.storeName} 
@@ -526,7 +522,7 @@ export default function Settings() {
                   Change Admin Password
                 </div>
                 
-                <div style={{ display: 'grid', gap: 12, maxWidth: 400 }}>
+                <div className="form-grid-1" style={{ maxWidth: 400 }}>
                   <div className="form-field">
                     <label>
                       Current Password <span style={{ color: '#e74c3c' }}>*</span>
