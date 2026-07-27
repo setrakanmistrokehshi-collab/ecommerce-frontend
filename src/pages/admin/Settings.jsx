@@ -263,35 +263,13 @@ export default function Settings() {
         <div className="card settings-tabs" style={{ padding:8 }}>
 
           {TABS.map(t => (
-            <div
-              key={t.id}
-              className={`nav-item ${tab === t.id ? 'active' : ''}`}
-              style={{ 
-                margin: '1px 0', 
-                padding: '10px 12px',
-                borderRadius: 8,
-                cursor: 'pointer',
-                background: tab === t.id ? 'var(--accent)' : 'transparent',
-                color: tab === t.id ? 'white' : 'var(--text)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                transition: 'all 0.2s'
-              }}
-              onClick={() => setTab(t.id)}
-              onMouseEnter={(e) => {
-                if (tab !== t.id) {
-                  e.currentTarget.style.background = 'var(--surface2)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (tab !== t.id) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              <span>{t.icon}</span> {t.label}
-            </div>
+           <div
+  key={t.id}
+  className={`nav-item settings-tab-item ${tab === t.id ? 'active' : ''}`}
+  onClick={() => setTab(t.id)}
+>
+  <span>{t.icon}</span> {t.label}
+</div>
           ))}
         </div>
 
