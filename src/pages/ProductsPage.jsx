@@ -13,6 +13,7 @@ const SORTS = [
 ];
 
 export default function ProductsPage() {
+  const [items, setItems]     = useState([]);
   const [params, setParams] = useSearchParams();
   const [data, setData]     = useState(null);
   const [loading, setLoading] = useState(true);

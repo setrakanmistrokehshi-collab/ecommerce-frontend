@@ -29,8 +29,9 @@ import ProfilePage from '@/pages/ProfilePage';
 import OrdersPage from '@/pages/OrdersPage';
 import WishlistPage from '@/pages/WishlistPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import { products } from '@/api/client';
+import { OAuthCallbackPage } from '@/hooks/GoogleAuth';
 
-// Admin
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminProducts from '@/pages/admin/AdminProducts';
@@ -45,6 +46,10 @@ import Reviews from '@/pages/admin/Reviews';
 import Categories from '@/pages/admin/Categories';
 import EditUserRole from '@/pages/admin/EditUserRole';
 import Settings from '@/pages/admin/Settings';
+
+products.list({ page: 1, limit: 12 }).catch(() => {});
+products.list({ page: 1, limit: 12, featured: true }).catch(() => {});
+
 
 // ─────────────────────────────────────────────
 // LOADING
@@ -156,6 +161,8 @@ const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'oauth/callback', element: <OAuthCallbackPage /> },
+      
     ],
   },
 

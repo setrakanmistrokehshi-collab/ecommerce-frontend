@@ -23,6 +23,7 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
+
   return (
     <div>
      <section className='hero-section' style={{
