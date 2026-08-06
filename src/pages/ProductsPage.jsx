@@ -17,6 +17,7 @@ export default function ProductsPage() {
   const [params, setParams] = useSearchParams();
   const [data, setData]     = useState(null);
   const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
 
   const category = params.get('category') || '';
   const search   = params.get('search')   || '';
@@ -32,19 +33,28 @@ export default function ProductsPage() {
   };
 
   const fetchProducts = useCallback(() => {
+    const controller = new AbortController();
     setLoading(true);
+    setError(null);
     const q = { sort, page, limit: 12 };
     if (category) q.category = category;
     if (search)   q.search   = search;
     if (featured) q.featured = featured;
-    productsApi.list(q)
-      .then(({ data }) => setData(data))
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
-  }, [category, search, sort, page, featured]);
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+    productsApi.list(q, { signal: controller.signal })
+    .then(({ data }) => setData(data))
+    .catch((err) => {
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
+      console.error('Failed to load products:', err);
+      setError(err);
+      setData(null);
+    })
+    .finally(() => setLoading(false));
 
+  return () => controller.abort();
+}, [category, search, sort, page, featured]);
+
+useEffect(() => fetchProducts(), [fetchProducts]);
   return (
     <div style={{ minHeight: '80vh' }}>
       {/* Header */}
