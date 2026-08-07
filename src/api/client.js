@@ -56,7 +56,7 @@ const setCached = (key, data) => {
 // ── Axios instance ────────────────────────────────────────────────
 const api = axios.create({
   baseURL: API_V1,
-  timeout: 15000,
+  timeout: 61000,
   headers: { 'Content-Type': 'application/json' },
 });
 
