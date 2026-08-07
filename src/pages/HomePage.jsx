@@ -19,7 +19,7 @@ export default function HomePage() {
   useEffect(() => {
     productsApi.list({ featured: true, limit: 6 })
       .then(({ data }) => setFeatured(data.products || []))
-      .catch(() => {})
+      .catch((err) => {console.error('Failed to load featured products:', err); setFeatured([]); })
       .finally(() => setLoading(false));
   }, []);
 
