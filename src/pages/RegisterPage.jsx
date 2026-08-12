@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import useAuthStore from '@/context/authStore';
 import { Field } from '@/components/ui';
-import { GoogleLoginButton } from '@/hooks/GoogleAuth';
+import  GoogleSignInButton  from '@/hooks/useGoogleIdentity';
 import toast from 'react-hot-toast';
 
 // ── Shared Auth Card Shell (same as Login – already responsive-ready) ──

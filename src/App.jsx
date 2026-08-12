@@ -30,7 +30,7 @@ import OrdersPage from '@/pages/OrdersPage';
 import WishlistPage from '@/pages/WishlistPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import { products } from '@/api/client';
-import { OAuthCallbackPage } from '@/hooks/GoogleAuth';
+//import { OAuthCallbackPage } from '@/hooks/GoogleAuth';
 
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
@@ -161,7 +161,7 @@ const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
-      { path: 'oauth/callback', element: <OAuthCallbackPage /> },
+      // { path: 'oauth/callback', element: <OAuthCallbackPage /> },
       
     ],
   },

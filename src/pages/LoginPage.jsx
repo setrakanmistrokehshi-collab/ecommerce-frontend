@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import useAuthStore from '@/context/authStore';
 import { auth as authApi } from '@/api/client';
 import { Field } from '@/components/ui';
-import { GoogleSignInButton } from '@/components/GoogleSignInButton';
+import GoogleSignInButton  from '@/components/GoogleSignInButton';
 import toast from 'react-hot-toast';
 
 // ── Shared Auth Card Shell ────────────────────────────────────────

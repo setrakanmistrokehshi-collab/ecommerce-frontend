@@ -52,7 +52,7 @@ function loadGisScript() {
  * @param {(response: { credential: string }) => void} onCredential
  *   Called once with the GIS ID token when the user signs in.
  */
-export function useGoogleIdentity(onCredential) {
+export default function useGoogleIdentity(onCredential) {
   const [ready, setReady] = useState(false);
   const callbackRef = useRef(onCredential);
   callbackRef.current = onCredential; // always call the latest callback

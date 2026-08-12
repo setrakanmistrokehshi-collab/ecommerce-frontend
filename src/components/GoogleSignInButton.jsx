@@ -53,3 +53,4 @@ export default function GoogleSignInButton({ onSuccess, onError }) {
   onSuccess={(user) => setCurrentUser(user)}
   onError={(err) => toast.error(err.message)}
 />
+
