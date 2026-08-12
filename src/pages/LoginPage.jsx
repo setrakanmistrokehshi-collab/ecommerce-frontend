@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import useAuthStore from '@/context/authStore';
 import { auth as authApi } from '@/api/client';
 import { Field } from '@/components/ui';
-import { GoogleLoginButton } from '@/hooks/GoogleAuth';
+import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 import toast from 'react-hot-toast';
 
 // ── Shared Auth Card Shell ────────────────────────────────────────
@@ -35,7 +35,7 @@ function AuthShell({ title, subtitle, children }) {
             Premium supplements trusted by 50,000+ Nigerians. Quality ingredients, real results.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 40 }}>
-            {['✓ Free delivery over ₦20,000', '✓ 30-day returns', '✓ 100% natural ingredients'].map(t => (
+            {['✓ Free delivery over ₦40,000', '✓ 30-day returns', '✓ 100% natural ingredients'].map(t => (
               <div key={t} style={{ color: 'var(--sage-light)', fontSize: 14 }}>{t}</div>
             ))}
           </div>
@@ -71,17 +71,10 @@ export function LoginPage() {
     }
   };
 
-
-  // ── Login ─────────────────────────────────────────────────────────
-// Only the JSX returned by LoginPage changed — AuthShell, RegisterPage,
-// ForgotPasswordPage, and all imports/logic above this stay exactly as
-// they are in your file. Replace just the `return (...)` block of
-// LoginPage with this.
-
   return (
     <AuthShell title='Welcome back' subtitle='Sign in to your account'>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        <GoogleLoginButton />
+        <GoogleSignInButton />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '8px 0' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />
