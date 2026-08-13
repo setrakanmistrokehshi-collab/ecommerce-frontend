@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import useAuthStore from '@/context/authStore';
 import { Field } from '@/components/ui';
-import  GoogleSignInButton  from '@/hooks/useGoogleIdentity';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 import toast from 'react-hot-toast';
 
 // ── Shared Auth Card Shell (same as Login – already responsive-ready) ──
@@ -169,11 +169,25 @@ export function RegisterPage() {
     }
   };
 
+  const handleGoogleSuccess = (data) => {
+    loginWithGoogle(data);
+    toast.success('Welcome back!');
+    navigate(params.get('redirect') || '/');
+  };
+
+  const handleGoogleError = (err) => {
+    toast.error(err.message || 'Google sign-in failed.');
+  };
+
+
   return (
     <AuthShell title="Create account" subtitle="Join thousands of healthy Nigerians">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         {/* Google */}
-        <GoogleLoginButton />
+         <GoogleSignInButton
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+        />
 
         {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '8px 0' }}>

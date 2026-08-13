@@ -56,7 +56,7 @@ function AuthShell({ title, subtitle, children }) {
 
 // ── Login ─────────────────────────────────────────────────────────
 export function LoginPage() {
-  const { login, isLoading } = useAuthStore();
+  const { login, loginWithGoogle, isLoading } = useAuthStore();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -71,10 +71,25 @@ export function LoginPage() {
     }
   };
 
+  
+   const handleGoogleSuccess = (data) => {
+     loginWithGoogle(data);
+     toast.success('Welcome back!');
+     navigate(params.get('redirect') || '/');
+   };
+ 
+   const handleGoogleError = (err) => {
+     toast.error(err.message || 'Google sign-in failed.');
+   };
+
   return (
     <AuthShell title='Welcome back' subtitle='Sign in to your account'>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        <GoogleSignInButton />
+        
+        <GoogleSignInButton
+         onSuccess={handleGoogleSuccess}
+         onError={handleGoogleError}
+        />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '8px 0' }}>
           <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #e5e7eb' }} />

@@ -1,4 +1,13 @@
-// components/GoogleSignInButton.jsx.
+// components/GoogleSignInButton.jsx
+//
+// Matches your actual auth response shape: { success, accessToken,
+// refreshToken, user } in the JSON body — not a cookie. This component
+// does NOT decide what to do with those tokens; it hands the whole
+// payload to onSuccess so you can feed it into whatever already
+// consumes /login's response (your Zustand auth store). Using the
+// same code path both places is what avoids a second, parallel state
+// path — which is the kind of gap that caused the Zustand rehydration
+// race you dealt with before.
 
 import { useEffect, useRef, useState } from 'react';
 import { useGoogleIdentity } from '../hooks/useGoogleIdentity';
@@ -24,6 +33,9 @@ export default function GoogleSignInButton({ onSuccess, onError }) {
         throw new Error(data.message || data.errors?.[0]?.msg || 'Google sign-in failed.');
       }
 
+      // Hand off { accessToken, refreshToken, user } to the same
+      // handler your password login already uses to populate the
+      // Zustand store — do not fork the logic here.
       onSuccess?.(data);
     } catch (err) {
       onError?.(err);
@@ -47,10 +59,3 @@ export default function GoogleSignInButton({ onSuccess, onError }) {
     </div>
   );
 }
-
-
-<GoogleSignInButton
-  onSuccess={(user) => setCurrentUser(user)}
-  onError={(err) => toast.error(err.message)}
-/>
-

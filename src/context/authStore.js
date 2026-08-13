@@ -26,42 +26,23 @@ const useAuthStore = create(
           isAuthenticated: !!user,
         }),
 
-       
-        googleLogin: () => {
-          window.location.href = authApi.googleAuthUrl();
-        
+loginWithGoogle: (data) => {
+        const { accessToken, refreshToken, user } = data;
+ 
+        TokenStore.set(accessToken);
+        TokenStore.setRefresh(refreshToken);
+ 
+        set({
+          user,
+          isAuthenticated: true,
+          isHydrated: true,
+          isLoading: false,
+          error: null,
+        });
+ 
+        return { success: true, user };
       },
-
-      handleGoogleCallback: async (code) => {
-          set({ isLoading: true, error: null });
  
-          try {
-            const response = await authApi.exchangeGoogleCode(code);
-            const { accessToken, refreshToken, user } = response.data;
- 
-            TokenStore.set(accessToken);
-            TokenStore.setRefresh(refreshToken);
- 
-            set({
-              user,
-              isAuthenticated: true,
-              isHydrated: true, // was missing — matches login()/fetchMe()'s pattern
-              isLoading: false,
-              error: null,
-            });
- 
-            return { success: true, user };
-          } catch (error) {
-            const message = error.response?.data?.error || 'Google login failed';
-            set({
-              error: message,
-              isLoading: false,
-              isHydrated: true,
-            });
-            return { success: false, error: message };
-          }
-        },
-
       login: async (credentials) => {
         set({ isLoading: true, error: null });
 

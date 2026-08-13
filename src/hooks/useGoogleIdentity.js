@@ -1,24 +1,9 @@
 // hooks/useGoogleIdentity.js
-//
-// Loads the new Google Identity Services script exactly once per page
-// load and exposes a single, memoized `google.accounts.id` handle.
-//
-// WHY THIS MATTERS FOR "SIGN IN TWICE":
-// React 18 StrictMode intentionally double-invokes effects in dev.
-// If you call `google.accounts.id.initialize()` inside a bare
-// useEffect, it can register the callback twice, or race with the
-// script still loading — leading to a first click that does nothing
-// (or fires an already-stale callback) and a second click that works.
-// The module-level singleton below guarantees the script loads once
-// and `initialize` is called exactly once, regardless of how many
-// components mount/unmount or how many times effects re-run.
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
 
-// Module-level (not component-level) singleton state — survives
-// remounts and StrictMode's double-invoke.
 let scriptLoadPromise = null;
 let initialized = false;
 
@@ -52,7 +37,7 @@ function loadGisScript() {
  * @param {(response: { credential: string }) => void} onCredential
  *   Called once with the GIS ID token when the user signs in.
  */
-export default function useGoogleIdentity(onCredential) {
+export function useGoogleIdentity(onCredential) {
   const [ready, setReady] = useState(false);
   const callbackRef = useRef(onCredential);
   callbackRef.current = onCredential; // always call the latest callback
@@ -67,9 +52,9 @@ export default function useGoogleIdentity(onCredential) {
         google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: (response) => callbackRef.current?.(response),
-          auto_select: false,        // don't silently re-auth returning users
-          use_fedcm_for_prompt: true, // required — Google is phasing out the old prompt
-          itp_support: true,          // Safari/ITP compatibility
+          auto_select: false,        
+          use_fedcm_for_prompt: true, 
+          itp_support: true,        
         });
         initialized = true;
       }
