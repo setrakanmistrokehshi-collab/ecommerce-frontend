@@ -12,7 +12,7 @@ import { ROLES } from '@/constants/roles';
 // Layouts
 import StorefrontLayout from '@/components/layout/StorefrontLayout';
 import AdminLayout from '@/components/layout/AdminLayout';
-
+import { ResetPasswordPage } from './pages/LoginPage';
 import { AutoLogoutManager } from './components/AutoLogoutManager';
 import { AutoLogoutCountdown } from './components/AutoLogoutCountdown';
 
@@ -161,8 +161,7 @@ const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
-      // { path: 'oauth/callback', element: <OAuthCallbackPage /> },
-      
+      { path: 'reset-password/:token', element: <ResetPasswordPage /> },
     ],
   },
 
