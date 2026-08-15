@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import useAuthStore from '@/context/authStore';
 import { auth as authApi } from '@/api/client';
@@ -8,14 +8,27 @@ import GoogleSignInButton  from '@/components/GoogleSignInButton';
 import toast from 'react-hot-toast';
 
 // ── Shared Auth Card Shell ────────────────────────────────────────
+// Added: responsive breakpoint. Below 768px the brand panel drops out
+// entirely and the form takes the full width — previously this was a
+// fixed 45%/flex split with no mobile behavior at all.
 function AuthShell({ title, subtitle, children }) {
   return (
-    <div style={{
+    <div className="auth-shell" style={{
       minHeight: '100vh', display: 'flex',
       background: 'linear-gradient(135deg, var(--cream) 0%, var(--parchment) 100%)',
     }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .auth-shell__brand { display: none; }
+          .auth-shell__form { padding: var(--space-6) var(--space-4) !important; }
+        }
+        @media (max-width: 420px) {
+          .auth-shell__form-inner { max-width: 100% !important; }
+        }
+      `}</style>
+
       {/* Left panel */}
-      <div style={{
+      <div className="auth-shell__brand" style={{
         width: '45%', background: 'var(--forest-deep)',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: 'var(--space-12)',
@@ -43,8 +56,8 @@ function AuthShell({ title, subtitle, children }) {
       </div>
 
       {/* Right panel */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-8)' }}>
-        <div style={{ width: '100%', maxWidth: 440, animation: 'fadeUp 0.4s ease' }}>
+      <div className="auth-shell__form" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-8)' }}>
+        <div className="auth-shell__form-inner" style={{ width: '100%', maxWidth: 440, animation: 'fadeUp 0.4s ease' }}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 30, color: 'var(--forest-deep)', marginBottom: 6 }}>{title}</h1>
           <p style={{ color: 'var(--muted)', marginBottom: 'var(--space-8)' }}>{subtitle}</p>
           {children}
@@ -71,21 +84,20 @@ export function LoginPage() {
     }
   };
 
-  
-   const handleGoogleSuccess = (data) => {
-     loginWithGoogle(data);
-     toast.success('Welcome back!');
-     navigate(params.get('redirect') || '/');
-   };
- 
-   const handleGoogleError = (err) => {
-     toast.error(err.message || 'Google sign-in failed.');
-   };
+  const handleGoogleSuccess = (data) => {
+    loginWithGoogle(data);
+    toast.success('Welcome back!');
+    navigate(params.get('redirect') || '/');
+  };
+
+  const handleGoogleError = (err) => {
+    toast.error(err.message || 'Google sign-in failed.');
+  };
 
   return (
     <AuthShell title='Welcome back' subtitle='Sign in to your account'>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        
+
         <GoogleSignInButton
          onSuccess={handleGoogleSuccess}
          onError={handleGoogleError}
@@ -157,6 +169,115 @@ export function ForgotPasswordPage() {
           <Link to="/login" style={{ textAlign: 'center', fontSize: 14, color: 'var(--muted)' }}>← Back to Login</Link>
         </form>
       )}
+    </AuthShell>
+  );
+}
+
+// ── Reset Password ────────────────────────────────────────────────
+// The page that was missing. Route this at: /reset-password/:token
+//
+// authApi.resetPassword(token, password) is assumed to mirror the
+// forgotPassword(email) shape above — check /api/client and rename
+// if your backend expects e.g. authApi.resetPassword({ token, password }).
+export function ResetPasswordPage() {
+  const { token } = useParams();
+  // Fallback in case your email link uses a query string instead of
+  // a path param (?token=...) — harmless if unused.
+  const [searchParams] = useSearchParams();
+  const resetToken = token || searchParams.get('token');
+
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm();
+  const [done, setDone] = useState(false);
+  const [invalid, setInvalid] = useState(!resetToken);
+
+  const password = watch('password', '');
+
+  const onSubmit = async (data) => {
+    try {
+      await authApi.resetPassword(resetToken, data.password);
+      setDone(true);
+      toast.success('Password updated');
+      setTimeout(() => navigate('/login'), 1800);
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 400 || status === 410) {
+        setInvalid(true);
+      } else {
+        toast.error(err?.response?.data?.message || 'Something went wrong. Try again.');
+      }
+    }
+  };
+
+  if (invalid) {
+    return (
+      <AuthShell title="Link expired" subtitle="This reset link is no longer valid">
+        <div style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>⚠️</div>
+          <p style={{ color: 'var(--muted)', lineHeight: 1.7 }}>
+            The link may have expired or already been used. Request a fresh one to continue.
+          </p>
+          <Link to="/forgot-password" className='btn btn-primary btn-full' style={{ marginTop: 'var(--space-6)' }}>
+            Request new link
+          </Link>
+          <Link to="/login" style={{ display: 'block', textAlign: 'center', fontSize: 14, color: 'var(--muted)', marginTop: 12 }}>
+            Back to Login
+          </Link>
+        </div>
+      </AuthShell>
+    );
+  }
+
+  if (done) {
+    return (
+      <AuthShell title="Password updated" subtitle="Taking you to sign in...">
+        <div style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
+          <p style={{ color: 'var(--muted)', lineHeight: 1.7 }}>
+            Your password has been changed successfully.
+          </p>
+          <Link to="/login" className='btn btn-primary btn-full' style={{ marginTop: 'var(--space-6)' }}>
+            Go to sign in now
+          </Link>
+        </div>
+      </AuthShell>
+    );
+  }
+
+  return (
+    <AuthShell title="Set a new password" subtitle="Choose something strong and memorable">
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        <Field label='New Password' error={errors.password?.message}>
+          <input className={`input ${errors.password ? 'error' : ''}`} type='password' placeholder='Enter new password'
+            {...register('password', {
+              required: 'Password is required',
+              minLength: { value: 8, message: 'At least 8 characters' },
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+                message: 'Include upper, lower case and a number',
+              },
+            })} />
+        </Field>
+
+        <Field label='Confirm Password' error={errors.confirm?.message}>
+          <input className={`input ${errors.confirm ? 'error' : ''}`} type='password' placeholder='Re-enter new password'
+            {...register('confirm', {
+              required: 'Please confirm your password',
+              validate: (v) => v === password || 'Passwords do not match',
+            })} />
+        </Field>
+
+        <button className='btn btn-primary btn-full btn-lg' type='submit' disabled={isSubmitting}>
+          {isSubmitting ? <><div className='spinner' style={{ width: 18, height: 18 }} /> Updating...</> : 'Update Password'}
+        </button>
+
+        <Link to="/login" style={{ textAlign: 'center', fontSize: 14, color: 'var(--muted)' }}>← Back to Login</Link>
+      </form>
     </AuthShell>
   );
 }
