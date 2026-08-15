@@ -141,8 +141,8 @@ export const getApiError = (err) =>
 // ═══════════════════════════════════════════════════════════════════
 export const auth = {
   
-  exchangeGoogleCode: (code) => api.post('/auth/google/exchange', { code }),
-  googleAuthUrl: () => `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/google`,
+  //exchangeGoogleCode: (code) => api.post('/auth/google/exchange', { code }),
+  //googleAuthUrl: () => `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/google`,
 
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
