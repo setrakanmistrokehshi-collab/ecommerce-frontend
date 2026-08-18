@@ -26,7 +26,7 @@ const useAuthStore = create(
           isAuthenticated: !!user,
         }),
 
-loginWithGoogle: (data) => {
+        loginWithGoogle: (data) => {
         const { accessToken, refreshToken, user } = data;
  
         TokenStore.set(accessToken);

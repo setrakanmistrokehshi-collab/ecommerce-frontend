@@ -174,8 +174,6 @@ export function ForgotPasswordPage() {
 }
 
 // ── Reset Password ────────────────────────────────────────────────
-// The page that was missing. Route this at: /reset-password/:token
-//
 // authApi.resetPassword(token, password) is assumed to mirror the
 // forgotPassword(email) shape above — check /api/client and rename
 // if your backend expects e.g. authApi.resetPassword({ token, password }).
