@@ -196,21 +196,22 @@ export function ResetPasswordPage() {
 
   const password = watch('password', '');
 
-  const onSubmit = async (data) => {
-    try {
-      await authApi.resetPassword(resetToken, data.password);
-      setDone(true);
-      toast.success('Password updated');
-      setTimeout(() => navigate('/login'), 1800);
-    } catch (err) {
-      const status = err?.response?.status;
-      if (status === 400 || status === 410) {
-        setInvalid(true);
-      } else {
-        toast.error(err?.response?.data?.message || 'Something went wrong. Try again.');
-      }
+  
+const onSubmit = async (data) => {
+  try {
+    await authApi.resetPassword({ token: resetToken, password: data.password });
+    setDone(true);
+    toast.success('Password updated');
+    setTimeout(() => navigate('/login'), 1800);
+  } catch (err) {
+    const status = err?.response?.status;
+    if (status === 400 || status === 410) {
+      setInvalid(true);
+    } else {
+      toast.error(err?.response?.data?.message || 'Something went wrong. Try again.');
     }
-  };
+  }
+};
 
   if (invalid) {
     return (
