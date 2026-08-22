@@ -35,7 +35,7 @@ export default function OrderSuccessPage() {
         </h1>
         <p style={{ color: 'var(--muted)', lineHeight: 1.7, marginBottom: 'var(--space-8)', fontSize: 16 }}>
           {status === 'success'
-            ? 'Thank you for your order! We\'ll prepare your supplements with care and deliver them to you soon.'
+            ? 'Thank you for your order! We\'ll process your order and deliver them to you sooner.'
             : 'Your payment is being processed. You\'ll receive a confirmation email shortly.'}
         </p>
 

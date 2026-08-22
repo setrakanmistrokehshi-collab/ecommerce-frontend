@@ -48,19 +48,21 @@ export default function CheckoutPage() {
     if (items.length === 0) { toast.error('Cart is empty'); return; }
     setSubmitting(true);
     try {
-      const payload = {
-        items: items.map((i) => ({ productId: i._id, quantity: i.quantity })),
-        shippingAddress: {
-          street: formData.street,
-          city:   formData.city,
-          state:  formData.state,
-          country: 'Nigeria',
-        },
-        customerName:  formData.name,
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        promoCode: promoData ? promo.trim().toUpperCase() : undefined,
-      };
+     const payload = {
+  items: items.map((i) => ({ productId: i._id, quantity: i.quantity })),
+  customer: {                         
+    name:  formData.name,
+    email: formData.email,
+    phone: formData.phone,
+  },
+  shippingAddress: {
+    street: formData.street,
+    city:   formData.city,
+    state:  formData.state,
+    country: 'Nigeria', // hardcoded for now
+  },
+  promoCode: promoData ? promo.trim().toUpperCase() : undefined,
+};
 
       const { data } = await paymentsApi.checkout(payload);
       // Nomba redirect
